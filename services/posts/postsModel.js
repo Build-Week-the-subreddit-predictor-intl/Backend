@@ -1,10 +1,9 @@
 const db = require("../../database/db-config");
 
-async function getAllPosts() {
-  return db("posts")
-  .join('')
-  .join('')
-  .select('')
+async function getAllPosts(limit, sortby, sortdir) {
+	return db("posts")
+		.orderBy(sortby || "id", sortdir || "asc")
+		.limit(limit || "25");
 }
 
 async function createPost(post) {
@@ -33,6 +32,6 @@ module.exports = {
 	getAllPosts,
 	createPost,
 	getPostById,
-  editPost,
-  deletePost
+	editPost,
+	deletePost
 };
