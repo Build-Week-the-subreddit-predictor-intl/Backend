@@ -34,6 +34,22 @@ const fetchPostById = (req, res) => {
 		});
 };
 
+const makePost = (req, res) => {
+	const post = req.body;
+	insert(post)
+		.then(response => {
+			res.status(201).json({
+				message: `Succefully posted ${post.title} ${post.text}`
+			});
+		})
+		.catch(err => {
+			res.status(400).json({
+				message: `Unable to process request to create post because
+        ${err.message}`
+			});
+		});
+};
+
 module.exports = {
 	fetchAllPosts,
 	fetchPostById,
