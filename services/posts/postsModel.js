@@ -1,7 +1,10 @@
 const db = require("../../database/db-config");
 
 async function getAllPosts() {
-	return db("posts");
+  return db("posts")
+  .join('')
+  .join('')
+  .select('')
 }
 
 async function createPost(post) {
