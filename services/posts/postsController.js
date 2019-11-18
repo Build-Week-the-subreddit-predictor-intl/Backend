@@ -22,7 +22,7 @@ const fetchAllPosts = (req, res) => {
 
 const fetchPostById = (req, res) => {
 	const { id } = req.params;
-	createPost(id)
+	getPostById(id)
 		.then(post => {
 			res.status(200).json(post);
 		})
@@ -36,7 +36,7 @@ const fetchPostById = (req, res) => {
 
 const makePost = (req, res) => {
 	const post = req.body;
-	getPostById(post)
+	createPost(post)
 		.then(() => {
 			res.status(201).json({
 				message: `Succefully posted ${post.title} ${post.text}`
