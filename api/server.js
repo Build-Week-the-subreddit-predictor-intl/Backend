@@ -5,6 +5,7 @@ const helmet = require("helmet");
 const { logger } = require("../services/global/globalHelpers");
 const authRouter = require('../services/auth/authRouter');
 const redditRouter = require('../services/reddit/redditRouter');
+const postsRouter = require('../services/posts/postsRouter');
 
 const server = express();
 const { secure, origin } = require('../config');
@@ -23,5 +24,6 @@ server.get("/", (req, res) => {
 
 server.use("/api/auth", authRouter);
 server.use("/api/reddit", redditRouter);
+server.use("/api/posts", postsRouter);
 
 module.exports = server;
