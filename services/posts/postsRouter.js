@@ -1,6 +1,6 @@
 const express = require("express");
 
-const { validatePost } = require("./usersMiddleware");
+const { validatePost } = require("./postsMiddleware");
 const {
 	fetchAllPosts,
 	fetchPostById,
