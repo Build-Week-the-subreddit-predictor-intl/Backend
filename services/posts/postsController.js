@@ -36,7 +36,7 @@ const fetchPostById = (req, res) => {
 
 const makePost = (req, res) => {
 	const post = req.body;
-	insert(post)
+	getPostById(post)
 		.then(() => {
 			res.status(201).json({
 				message: `Succefully posted ${post.title} ${post.text}`
@@ -54,7 +54,7 @@ const updatePost = (req, res) => {
 	const { id } = req.params;
 	const post = req.body;
 
-	update(id, post)
+	editPost(id, post)
 		.then(() => {
 			res.status(200).json({
 				message: `Succefully updated post ${id} with ${post.title} ${post.text}`
@@ -70,7 +70,7 @@ const updatePost = (req, res) => {
 
 const removePost = (req, res) => {
 	const { id } = req.params;
-	remove(id)
+	deletePost(id)
 		.then(() => {
 			res.status(200).json({
 				message: `Post ${id} was succesfully removed`
