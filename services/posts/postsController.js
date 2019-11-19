@@ -4,7 +4,8 @@ const {
 	createPost,
 	getPostById,
 	editPost,
-	deletePost
+	deletePost,
+	getPostSuggestions
 } = require("./postsModel");
 
 const fetchAllUserPosts = async (req, res, next) => {
@@ -20,14 +21,39 @@ const fetchAllUserPosts = async (req, res, next) => {
   }
 };
 
-const fetchPostById = (req, res, next) => {
-	const id = req.loggedInUser.subject;
-	getPostById(id)
-		.then(post => {
-			res.status(200).json(post);
-		})
-		.catch(err => next({ message: `Unable to process request for post information because ${err.message}`, status: 400 }));
+const fetchPostById = async (req, res) => {
+	const { id } = req.params;
+	try {
+		let post = await getPostById(id);
+		let suggestion = await getPostSuggestions(id);
+		let postSuggestion = { suggestion: suggestion, ...post };
+		res.status(200).json(postSuggestion);
+	} catch (err) {
+		res.status(400).json({
+			error: `Unable to process request for post ${id} 
+        information because ${err.message}`
+		});
+	}
+
 };
+
+// const fetchAllUserPostsWithSuggestions = async (req, res, next) => {
+// 	try {
+// 		const { id } = req.params;
+// 		let allPosts = await getAllPosts(id);
+// 		Promise.all(allPosts.map(post => getPostSuggestions(post.id))).then(
+// 			allSuggestions => {
+// 				allPosts = allPosts.map((post, i) => ({
+// 					...post,
+// 					suggestions: allSuggestions[i]
+// 				}));
+// 				res.status(200).json(allPosts);
+// 			}
+// 		);
+// 	} catch (error) {
+// 		next({ message: error });
+// 	}
+// };
 
 const makePost = (req, res, next) => {
   const { title, text } = req.body; // will receive the form values for a new post
