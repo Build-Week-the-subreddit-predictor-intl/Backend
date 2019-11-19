@@ -72,7 +72,7 @@ const makePost = (req, res, next) => {
 const createSubredditsIfNonExistent = (suggestions, next) => {
   try {
     let suggestionIds = [];
-    suggestions.forEach(subreddit => {
+    suggestions.forEach(async (subreddit) => {
       let realSuggestion = await getSubreddit({ subreddit_name: subreddit });
       if(!realSuggestion || !realSuggestion.id) {
         realSuggestion = await createSubreddit(subreddit);
