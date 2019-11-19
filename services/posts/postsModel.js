@@ -1,28 +1,30 @@
 const db = require("../../database/db-config");
 
-async function getAllPosts(limit, sortby, sortdir) {
-	return db("posts")
-		.orderBy(sortby || "id", sortdir || "asc")
-		.limit(limit || "25");
+function getAllPosts() {
+	return db("posts");
 }
 
-async function createPost(post) {
+function getPostSuggestions() {
+	return db("post_suggestion").join('');
+}
+
+function createPost(post) {
 	return db("posts").insert(post);
 }
 
-async function getPostById(id) {
+function getPostById(id) {
 	return db("posts")
 		.where({ id })
 		.first();
 }
 
-async function editPost(id, post) {
+function editPost(id, post) {
 	return db("posts")
 		.where({ id })
 		.update(post);
 }
 
-async function deletePost(id) {
+function deletePost(id) {
 	return db("posts")
 		.where({ id })
 		.del();

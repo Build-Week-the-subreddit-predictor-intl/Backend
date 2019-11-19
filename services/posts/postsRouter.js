@@ -1,8 +1,9 @@
 const express = require("express");
 
 const { validatePost } = require("./postsMiddleware");
+
 const {
-	fetchAllPosts,
+	fetchAllUserPosts,
 	fetchPostById,
 	makePost,
 	updatePost,
@@ -11,8 +12,9 @@ const {
 
 const router = express.Router();
 
-router.get("/", fetchAllPosts);
 router.post("/", validatePost, makePost);
+
+router.get("/all/:id", fetchAllUserPosts);
 
 router.get("/:id", fetchPostById);
 router.put("/:id", validatePost, updatePost);
