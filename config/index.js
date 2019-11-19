@@ -19,5 +19,6 @@ module.exports = {
   redditState: process.env.REDDIT_STATE,
   redditClientId: process.env.REDDIT_CLIENT_ID,
   redditClientSecret: process.env.REDDIT_CLIENT_SECRET,
-  redditRedirectURL: process.env.REDDIT_REDIRECT_URL
+  redditRedirectURL: process.env.REDDIT_REDIRECT_URL,
+  dataScienceModel: process.env.DS_URL
 }
