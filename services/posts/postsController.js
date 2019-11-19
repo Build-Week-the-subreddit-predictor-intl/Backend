@@ -34,23 +34,9 @@ const fetchPostById = async (req, res) => {
 		});
 	}
 
-	// getPostById(id)
-	// 	.then(post => {
-	// 		const postWithSuggestion = [];
-	// 		getPostSuggestions(post.id).then(suggestions => {
-	// 			postWithSuggestion.push({ suggestion: suggestions, ...post });
-	// 		});
-	// 		res.status(200).json(postWithSuggestion);
-	// 	})
-	// 	.catch(err => {
-	// 		res.status(400).json({
-	// 			error: `Unable to process request for post ${id}
-	//       information because ${err.message}`
-	// 		});
-	// 	});
 };
 
-// const fetchAllUserPosts = async (req, res, next) => {
+// const fetchAllUserPostsWithSuggestions = async (req, res, next) => {
 // 	try {
 // 		const { id } = req.params;
 // 		let allPosts = await getAllPosts(id);
