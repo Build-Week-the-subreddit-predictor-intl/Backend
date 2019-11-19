@@ -1,5 +1,6 @@
 const express = require("express");
 
+const { handleErrors } = require('../global/globalHelpers');
 const { validatePost } = require("./postsMiddleware");
 const {
 	fetchAllPosts,
@@ -17,5 +18,7 @@ router.post("/", validatePost, makePost);
 router.get("/:id", fetchPostById);
 router.put("/:id", validatePost, updatePost);
 router.delete("/:id", removePost);
+
+handleErrors('postsRouter', router);
 
 module.exports = router;
