@@ -7,6 +7,48 @@ const {
 	getPostSuggestions
 } = require("./postsModel");
 
+const fetchAllUserPosts = (req, res) => {
+	const { id } = req.params;
+	getAllPosts(id)
+		.then(user => {
+			res.status(200).json(user);
+		})
+		.catch(err => {
+			res
+				.status(400)
+				.json({ message: `unable to fetch user ${id} because ${err.message}` });
+		});
+};
+
+const fetchPostById = async (req, res) => {
+	const { id } = req.params;
+	try {
+		let post = await getPostById(id);
+		let suggestion = await getPostSuggestions(id);
+		let postSuggestion = { suggestion: suggestion, ...post };
+		res.status(200).json(postSuggestion);
+	} catch (err) {
+		res.status(400).json({
+			error: `Unable to process request for post ${id} 
+        information because ${err.message}`
+		});
+	}
+
+	// getPostById(id)
+	// 	.then(post => {
+	// 		const postWithSuggestion = [];
+	// 		getPostSuggestions(post.id).then(suggestions => {
+	// 			postWithSuggestion.push({ suggestion: suggestions, ...post });
+	// 		});
+	// 		res.status(200).json(postWithSuggestion);
+	// 	})
+	// 	.catch(err => {
+	// 		res.status(400).json({
+	// 			error: `Unable to process request for post ${id}
+	//       information because ${err.message}`
+	// 		});
+	// 	});
+};
 
 // const fetchAllUserPosts = async (req, res, next) => {
 // 	try {
@@ -25,32 +67,6 @@ const {
 // 		next({ message: error });
 // 	}
 // };
-
-const fetchAllUserPosts = (req, res)=>{
-	const {id} = req.params;
-	getAllPosts(id)
-	.then(user=>{
-		res.status(200).json(user)
-	})
-	.catch(err=>{
-		res.status(400).json({message: `unable to fetch user ${id} because ${err.message}`})
-	})
-}
-
-const fetchPostById = (req, res) => {
-	const { id } = req.params;
-
-	getPostById(id)
-		.then(post => {
-			res.status(200).json(post);
-		})
-		.catch(err => {
-			res.status(400).json({
-				error: `Unable to process request for post ${id} 
-        information because ${err.message}`
-			});
-		});
-};
 
 const makePost = (req, res) => {
 	const post = req.body;

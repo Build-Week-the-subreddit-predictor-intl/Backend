@@ -12,8 +12,7 @@ function getPostSuggestions(id) {
 		.select('s.subreddit_name');
 }
 
-// post_id posts
-// subreddit_id subreddits
+
 
 function createPost(post) {
 	return db("posts").insert(post);
