@@ -2,11 +2,11 @@ exports.up = function(knex) {
 	return knex.schema.createTable("post_suggestion", table => {
 		table.increments();
 		table
-			.integer("user_id")
+			.integer("subreddit_id")
 			.unsigned()
 			.notNullable()
 			.references("id")
-			.inTable("users")
+			.inTable("subreddits")
 			.onDelete("CASCADE");
 		table
 			.integer("post_id")

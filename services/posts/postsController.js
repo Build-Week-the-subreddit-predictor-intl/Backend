@@ -7,9 +7,9 @@ const {
 	deletePost
 } = require("./postsModel");
 
-const fetchAllPosts = (req, res) => {
-	const { limit, sortBy, sortDir } = req.query;
-	getAllPosts(limit, sortBy, sortDir)
+const fetchAllUserPosts = (req, res) => {
+	const id = req.loggedInUser.subject;
+	getAllPosts(id)
 		.then(posts => {
 			res.status(200).json(posts);
 		})
@@ -124,7 +124,7 @@ const removePost = (req, res) => {
 };
 
 module.exports = {
-	fetchAllPosts,
+	fetchAllUserPosts,
 	fetchPostById,
 	makePost,
 	updatePost,

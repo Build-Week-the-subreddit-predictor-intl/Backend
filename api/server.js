@@ -3,18 +3,22 @@ const cors = require("cors");
 const helmet = require("helmet");
 
 const { logger } = require("../services/global/globalHelpers");
-const authRouter = require('../services/auth/authRouter');
-const redditRouter = require('../services/reddit/redditRouter');
-const postsRouter = require('../services/posts/postsRouter');
+const { requireLogin } = require("../services/global/globalHelpers");
+
+const authRouter = require("../services/auth/authRouter");
+const redditRouter = require("../services/reddit/redditRouter");
+const postsRouter = require("../services/posts/postsRouter");
 
 const server = express();
-const { secure, origin } = require('../config');
+const { secure, origin } = require("../config");
 
 server.use(helmet());
-server.use(cors({
-  origin,
-  credentials: true // cookies?
-}));
+server.use(
+	cors({
+		origin,
+		credentials: true // cookies?
+	})
+);
 server.use(express.json());
 server.use(logger);
 
