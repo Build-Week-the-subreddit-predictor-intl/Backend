@@ -8,23 +8,34 @@ const {
 } = require("./postsModel");
 
 
-const fetchAllUserPosts = async (req, res, next) => {
-	try {
-		const { id } = req.params;
-		let allPosts = await getAllPosts(id);
-		Promise.all(allPosts.map(post => getPostSuggestions(post.id))).then(
-			allSuggestions => {
-				allPosts = allPosts.map((post, i) => ({
-					...post,
-					suggestions: allSuggestions[i]
-				}));
-				res.status(200).json(allPosts);
-			}
-		);
-	} catch (error) {
-		next({ message: error });
-	}
-};
+// const fetchAllUserPosts = async (req, res, next) => {
+// 	try {
+// 		const { id } = req.params;
+// 		let allPosts = await getAllPosts(id);
+// 		Promise.all(allPosts.map(post => getPostSuggestions(post.id))).then(
+// 			allSuggestions => {
+// 				allPosts = allPosts.map((post, i) => ({
+// 					...post,
+// 					suggestions: allSuggestions[i]
+// 				}));
+// 				res.status(200).json(allPosts);
+// 			}
+// 		);
+// 	} catch (error) {
+// 		next({ message: error });
+// 	}
+// };
+
+const fetchAllUserPosts = (req, res)=>{
+	const {id} = req.params;
+	getAllPosts(id)
+	.then(user=>{
+		res.status(200).json(user)
+	})
+	.catch(err=>{
+		res.status(400).json({message: `unable to fetch user ${id} because ${err.message}`})
+	})
+}
 
 const fetchPostById = (req, res) => {
 	const { id } = req.params;
