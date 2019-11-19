@@ -40,23 +40,14 @@ const objectToQueryString = (obj, questionMark = true) => {
   return (questionMark ? '?' : '') + Object.keys(obj).reduce((a, k) => [...a, k + '=' + encodeURIComponent(obj[k])], []).join('&');
 }
 
-const authorizeRedditAccess = (isMobile = false) => {
-  const options = {
-    client_id: config.redditClientId,
-    response_type: 'code',
-    state: bcrypt.hashSync(config.redditState, 11),
-    redirect_uri: config.redditRedirectURL,
-    duration: 'permanent',
-    scope: 'submit mysubreddits' // OR 'submit,mysubreddits'
-    //identity, edit, flair, history, modconfig, modflair, modlog, modposts, modwiki, mysubreddits, privatemessages, read, report, save, submit, subscribe, vote, wikiedit, wikiread
-  }
-  return 'https://www.reddit.com/api/v1/authorize' + (isMobile ? '.compact' : '') + objectToQueryString(options);
-}
+const toBase64 = (data) => Buffer.from(data).toString('base64');
+const toUTF8 = (data) => Buffer.from(data, 'base64').toString('utf-8');
 
 module.exports = {
   logger,
   requireLogin,
   handleErrors,
-  authorizeRedditAccess,
-  objectToQueryString
+  objectToQueryString,
+  toBase64,
+  toUTF8
 };
