@@ -1,7 +1,7 @@
 const express = require("express");
 
 const { handleErrors, requireLogin } = require('../global/globalHelpers');
-const { validatePost } = require("./postsMiddleware");
+const { validatePost, validatePostId } = require("./postsMiddleware");
 
 const {
 	fetchAllUserPosts,
