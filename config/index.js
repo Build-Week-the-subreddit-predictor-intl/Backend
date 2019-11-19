@@ -13,6 +13,8 @@ module.exports = {
     // for cookies to work with [SPA] + [API on different domain]
     // we can't enable CORS for '*'
     'http://localhost:3000',
+    'https://front-end.posthere.now.sh/',
+    'https://post-here-api.herokuapp.com/'
   ],
   secure: isProduction, // cookie sent over http only in dev
   jwtSecret: process.env.TOKENSECRET,
