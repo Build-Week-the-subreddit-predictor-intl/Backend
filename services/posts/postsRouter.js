@@ -13,13 +13,11 @@ const {
 
 const router = express.Router();
 
+router.get("/", requireLogin, fetchAllUserPosts);
+router.get("/:id", requireLogin, validatePostId, fetchPostById);
 router.post("/", requireLogin, validatePost, makePost);
-
-router.get("/all", requireLogin, fetchAllUserPosts);
-
-router.get("/:id", requireLogin, fetchPostById);
-router.put("/:id", requireLogin, validatePost, updatePost);
-router.delete("/:id", requireLogin, removePost);
+router.put("/:id", requireLogin, validatePostId, validatePost, updatePost);
+router.delete("/:id", requireLogin, validatePostId, removePost);
 
 handleErrors('postsRouter', router);
 
