@@ -20,6 +20,6 @@ module.exports = {
   jwtSecret: process.env.TOKENSECRET,
   redditClientId: process.env.REDDIT_CLIENT_ID,
   redditClientSecret: process.env.REDDIT_CLIENT_SECRET,
-  redditRedirectURL: (isProduction ? process.env.REDDIT_REDIRECT_URL : 'http://localhost:4000/api/reddit/auth'),
+  redditRedirectURL: (isProduction ? process.env.REDDIT_REDIRECT_URL : 'http://localhost:3000/dashboard'),
   dataScienceModel: process.env.DS_URL
 }
