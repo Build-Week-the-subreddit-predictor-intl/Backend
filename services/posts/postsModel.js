@@ -1,12 +1,18 @@
 const db = require("../../database/db-config");
 
-function getAllPosts() {
-	return db("posts");
+function getAllPosts(id) {
+	return db("posts").where("user_id", "=", id);
 }
 
-function getPostSuggestions() {
-	return db("post_suggestion").join('');
+function getPostSuggestions(id) {
+	return db("post_suggestion as ps")
+		.join("posts as p", "p.id", "ps.post_id")
+		.join("subreddits as s", "s.id", "ps.subreddit_id")
+		.where("post_id", "=", id);
 }
+
+// post_id posts
+// subreddit_id subreddits
 
 function createPost(post) {
 	return db("posts").insert(post);
