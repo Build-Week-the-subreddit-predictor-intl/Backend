@@ -2,7 +2,7 @@ const config = require('../../config');
 const bcrypt = require('bcryptjs');
 const redditRouter = require('express').Router();
 // Helpers
-const authHelpers = require('../auth/authHelpers');
+const { updateUser } = require('../auth/authModel');
 const {
   requireLogin,
   handleErrors,
@@ -37,7 +37,7 @@ redditRouter.get('/auth', requireLogin, (req, res, next) => {
         if (data.refresh_token) {
           payload.refresh_token = data.refresh_token;
         }
-        authHelpers.updateUser(payload, req.loggedInUser.id).then(response => {
+        updateUser(payload, req.loggedInUser.id).then(response => {
           if (response.data && response.data.id) {
             res.status(200).json({ authorized: true }); //req.loggedInUser.redditAuth = true;
           } else {

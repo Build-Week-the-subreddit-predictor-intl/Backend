@@ -1,6 +1,6 @@
 require('dotenv').config();
 const env = process.env.NODE_ENV || 'development';
-const adminpw = process.env.ADMIN_PW 
+const adminpw = process.env.ADMIN_PW;
 const isProduction = env === 'production';
 const port = process.env.PORT || 4000;
 
