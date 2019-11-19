@@ -7,37 +7,31 @@ const {
 	deletePost
 } = require("./postsModel");
 
-const fetchAllUserPosts = (req, res) => {
+const fetchAllUserPosts = (req, res, next) => {
 	const id = req.loggedInUser.subject;
 	getAllPosts(id)
 		.then(posts => {
 			res.status(200).json(posts);
 		})
-		.catch(err => {
-			res.status(400).json({
-				message:
-					"Unable to process request for all posts because " + err.message
-			});
-		});
+		.catch(err => next({ message: `Unable to process request for all posts because ${err.message}`, status: 400 }));
 };
 
-const fetchPostById = (req, res) => {
-	const { id } = req.params;
+const fetchPostById = (req, res, next) => {
+	const id = req.loggedInUser.subject;
 	getPostById(id)
 		.then(post => {
 			res.status(200).json(post);
 		})
-		.catch(err => {
-			res.status(400).json({
-				error: `Unable to process request for post ${id} 
-        information because ${err.message}`
-			});
-		});
+		.catch(err => next({ message: `Unable to process request for post information because ${err.message}`, status: 400 }));
 };
 
 const makePost = (req, res, next) => {
   const { title, text } = req.body; // will receive the form values for a new post
-  const post = { title, text };
+  const post = { 
+    title, 
+    text, 
+    user_id: req.loggedInUser.subject
+  };
   Promise.all([
     createPost(post), 
     axios.post(config.dataScienceModel, post)
