@@ -7,13 +7,17 @@ const {
 	deletePost
 } = require("./postsModel");
 
-const fetchAllUserPosts = (req, res, next) => {
-	const id = req.loggedInUser.subject;
-	getAllPosts(id)
-		.then(posts => {
-			res.status(200).json(posts);
-		})
-		.catch(err => next({ message: `Unable to process request for all posts because ${err.message}`, status: 400 }));
+const fetchAllUserPosts = async (req, res, next) => {
+  try {
+    const id = req.loggedInUser.subject;
+    const allPosts = await getAllPosts(id);
+    Promise.all(allPosts.map(post => getPostSuggestions(post.id))).then((allSuggestions) => {
+      allPosts = allPosts.map((post, i) => ({ ...post, suggestions: allSuggestions[i] }))
+      res.status(200).json(allPosts);
+    });
+  } catch (error) {
+    next({ message: error });
+  }
 };
 
 const fetchPostById = (req, res, next) => {
