@@ -22,7 +22,6 @@ redditRouter.get('/auth', requireLogin, (req, res, next) => {
     let payload = objectToQueryString({
       grant_type: (req.loggedInUser.access_token ? 'refresh_token' : 'authorization_code'),
       redirect_uri: config.redditRedirectURL,
-      duration: 'permanent'
     }, false);
     if (isValidState) {
       if (code) {
