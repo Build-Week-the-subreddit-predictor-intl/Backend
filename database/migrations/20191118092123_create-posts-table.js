@@ -7,7 +7,8 @@ exports.up = function(knex) {
 			.notNullable()
 			.references("id")
 			.inTable("users")
-			.onDelete("CASCADE");
+			.onDelete("CASCADE")
+			.onUpdate("CASCADE");
 		table.string("title").notNullable();
 		table.string("text").notNullable();
 		table.boolean("ad").defaultTo(false);
