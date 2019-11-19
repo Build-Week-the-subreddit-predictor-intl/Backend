@@ -8,7 +8,8 @@ function getPostSuggestions(id) {
 	return db("post_suggestion as ps")
 		.join("posts as p", "p.id", "ps.post_id")
 		.join("subreddits as s", "s.id", "ps.subreddit_id")
-		.where("post_id", "=", id);
+		.where("post_id", "=", id)
+		.select('s.subreddit_name');
 }
 
 // post_id posts
@@ -41,5 +42,6 @@ module.exports = {
 	createPost,
 	getPostById,
 	editPost,
-	deletePost
+	deletePost,
+	getPostSuggestions
 };
