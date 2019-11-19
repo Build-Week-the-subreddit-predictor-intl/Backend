@@ -1,0 +1,45 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "nodemon index.js",
+    "start": "node index.js",
+    "test": "cross-env NODE_ENV=testing jest --watchAll",
+    "updateDevDB": "npx knex migrate:latest --env development && npx knex seed:run --env development",
+    "updateTestDB": "npx knex migrate:latest --env testing && npx knex seed:run --env testing"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Build-Week-the-subreddit-predictor-intl/Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Build-Week-the-subreddit-predictor-intl/Backend/issues"
+  },
+  "homepage": "https://github.com/Build-Week-the-subreddit-predictor-intl/Backend#readme",
+  "devDependencies": {
+    "cross-env": "^6.0.3",
+    "eslint": "^6.6.0",
+    "eslint-plugin-react": "^7.16.0",
+    "jest": "^24.9.0",
+    "nodemon": "^1.19.4",
+    "supertest": "^4.0.2"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^3.21.2",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.20.2",
+    "pg": "^7.12.1",
+    "snoowrap": "^1.20.1",
+    "sqlite3": "^4.1.0"
+  }
+}
