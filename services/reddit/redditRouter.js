@@ -13,8 +13,12 @@ const {
 const { authorizeRedditAccess } = require('./redditController');
 // Endpoints
 redditRouter.get('/', requireLogin, (req, res, next) => {
-  const { mobile } = req.query;
-  res.status(200).json({ url: authorizeRedditAccess(req.loggedInUser.subject, mobile ? true : false) });
+  const { mobile, redirect } = req.query;
+  const data = {
+    id: req.loggedInUser.subject,
+    redirect
+  };
+  res.status(200).json({ url: authorizeRedditAccess(data, mobile ? true : false) });
 });
 
 redditRouter.get('/auth', async (req, res, next) => {
@@ -48,7 +52,7 @@ redditRouter.get('/auth', async (req, res, next) => {
     // save access_token, refresh_token to user table | token_type, expires_in, scope
     const updatedUser = await updateUser(redditAccess.data, user.id);
     if (updatedUser.data && updatedUser.data.id) {
-      res.status(200).json({ authorized: true });
+      res.status(200).redirect(validState.redirect);
     } else {
       res.status(403).json({ authorized: false });
     }

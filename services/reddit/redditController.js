@@ -1,11 +1,11 @@
 const config = require('../../config');
 const { objectToQueryString, toBase64 } = require('../global/globalHelpers');
 
-const authorizeRedditAccess = (userId, isMobile = false) => {
+const authorizeRedditAccess = (info, isMobile = false) => {
   const options = {
     client_id: config.redditClientId,
     response_type: 'code',
-    state: toBase64(JSON.stringify({ id: userId })),
+    state: toBase64(JSON.stringify(info)),
     redirect_uri: config.redditRedirectURL,
     duration: 'permanent',
     scope: 'submit mysubreddits' // OR 'submit,mysubreddits'
