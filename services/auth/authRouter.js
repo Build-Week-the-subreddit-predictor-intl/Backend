@@ -2,12 +2,9 @@ const bcrypt = require('bcryptjs');
 const authRouter = require('express').Router();
 // Helpers
 const { handleErrors } = require('../global/globalHelpers');
-const {
-  findUser,
-  addUser,
-  validateLoginBody,
-  generateJWT
-} = require('../auth/authHelpers');
+const { generateJWT } = require('./authController');
+const { validateLoginBody } = require('./authMiddleware');
+const { findUser, addUser } = require('./authModel');
 // Endpoints
 authRouter.post('/login', validateLoginBody, (req, res, next) => {
   const { username, password } = req.body;
