@@ -10,6 +10,16 @@ function validatePost(req, res, next) {
   }
 }
 
+function validatePostId(req, res, next) {
+  const { id } = req.params;
+  if(!id || !Number.isInteger(id)) {
+    next({ message: "Invalid post id!", status: 401 });
+  } else {
+    next();
+  }
+}
+
 module.exports = {
-	validatePost
+  validatePost,
+  validatePostId
 };
