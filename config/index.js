@@ -18,9 +18,8 @@ module.exports = {
   ],
   secure: isProduction, // cookie sent over http only in dev
   jwtSecret: process.env.TOKENSECRET,
-  redditState: process.env.REDDIT_STATE,
   redditClientId: process.env.REDDIT_CLIENT_ID,
   redditClientSecret: process.env.REDDIT_CLIENT_SECRET,
-  redditRedirectURL: process.env.REDDIT_REDIRECT_URL,
+  redditRedirectURL: (isProduction ? process.env.REDDIT_REDIRECT_URL : 'http://localhost:4000/api/reddit/auth'),
   dataScienceModel: process.env.DS_URL
 }
