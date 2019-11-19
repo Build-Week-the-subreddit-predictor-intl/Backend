@@ -39,7 +39,7 @@ const findUser = (filter) => {
 }
 
 const addUser = (newUser) => {
-  return db(users).insert(newUser).then((ids) => findUser({ id: ids[0] }));
+  return db(users).insert(newUser, 'id').then((ids) => findUser({ id: ids[0] }));
 }
 
 const updateUser = (changes, id) => {
