@@ -31,7 +31,8 @@ authRouter.post('/login', validateLoginBody, (req, res, next) => {
 
 authRouter.post('/register', validateLoginBody, (req, res, next) => {
   const { username, password } = req.body;
-  addUser({ username, password }).then(user => {
+  const hash = bcrypt.hashSync(password, 11);
+  addUser({ username: username, password: hash }).then(user => {
     if (!user) {
       next({ message: "User could not be added!" })
     } else {
