@@ -36,8 +36,8 @@ const handleErrors = (file, router) => {
   });
 }
 
-const objectToQueryString = (obj) => {
-  return '?' + Object.keys(obj).reduce((a, k) => [...a, k + '=' + encodeURIComponent(obj[k])], []).join('&');
+const objectToQueryString = (obj, questionMark = true) => {
+  return (questionMark ? '?' : '') + Object.keys(obj).reduce((a, k) => [...a, k + '=' + encodeURIComponent(obj[k])], []).join('&');
 }
 
 const authorizeRedditAccess = (isMobile = false) => {
@@ -57,5 +57,6 @@ module.exports = {
   logger,
   requireLogin,
   handleErrors,
-  authorizeRedditAccess
+  authorizeRedditAccess,
+  objectToQueryString
 };
