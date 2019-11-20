@@ -2,7 +2,6 @@ const config = require('../../config');
 const axios = require('axios');
 const snoowrap = require('snoowrap');
 const {
-  getAllPosts,
   createPost,
   getPostById,
   editPost,
