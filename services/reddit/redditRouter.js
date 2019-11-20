@@ -8,7 +8,7 @@ const {
   requireReddit,
   handleErrors,
   objectToQueryString,
-  toBase64
+  getRedditAxiosOptions
 } = require('../global/globalHelpers');
 const { authorizeRedditAccess } = require('./redditController');
 // Endpoints
@@ -43,9 +43,7 @@ redditRouter.post('/auth', requireLogin, requireReddit, async (req, res, next) =
       payload.refresh_token = user.refresh_token;
     }
     payload = objectToQueryString(payload, false);
-    let auth = toBase64(config.redditClientId + ':' + config.redditClientSecret);
-    let options = { headers: { Authorization: 'Basic ' + auth } };
-    const redditAccess = await axios.post('https://www.reddit.com/api/v1/access_token', payload, options)
+    const redditAccess = await axios.post('https://www.reddit.com/api/v1/access_token', payload, getRedditAxiosOptions())
     if (redditAccess.data.error) {
       next({ message: redditAccess.data.error });
       return;
