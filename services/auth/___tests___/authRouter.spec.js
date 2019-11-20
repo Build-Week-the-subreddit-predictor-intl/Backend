@@ -17,8 +17,8 @@ describe("1", () => {
 				.expect(200);
 		} catch (error) {
 			console.error(
-				"Error while testing [POST] /api/auth/login -> can login with correct credentials ->",
-				error
+				"Error while testing [POST] /api/auth/login",
+				
 			);
 		}
 	});
@@ -43,22 +43,29 @@ describe("2", () => {
 
 //login
 
-// describe("3", () => {
-// 	test("3", () => {
-// 		return request(server)
-// 			.post("/api/auth/login")
-// 			.send({ username: "test", password: "test" })
-// 			.expect();
-// 		// .expect({ message: "" });
-// 	});
-// });
+describe("3", () => {
+	test("3", () => {
+		return request(server)
+			.post("/api/auth/login")
+			.send({ username: "melqui", password: "melqui" })
+			// .expect();
+		// // .expect({ message: "" });
+	});
+});
 
-// describe("4", () => {
-// 	test("4", () => {
-// 		return request(server)
-// 			.post("/api/auth/login")
-// 			.send({ username: "melqui", password: "richany" })
-// 			.expect();
-// 		// .expect({ message: "" });
-// 	});
-// });
+describe("4", () => {
+	test("4", () => {
+		return request(server)
+			.post("/api/auth/login")
+			.send({ username: "melqui"})
+			.expect({
+				file: "authRouter",
+				url: "/login",
+				method: "POST",
+				status: 400,
+				message: "Missing required fields!",
+				protocol: "http"
+			});
+
+	});
+});

@@ -8,3 +8,9 @@ describe("1", () => {
 			.expect(200);
 	});
 });
+
+/*
+get /api/reddit
+post /api/reddit/auth
+
+*/
