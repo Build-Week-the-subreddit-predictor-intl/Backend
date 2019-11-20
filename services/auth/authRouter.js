@@ -20,10 +20,12 @@ authRouter.post('/login', validateLoginBody, (req, res, next) => {
         const token = generateJWT(user);
         let nowSeconds = Math.floor(Date.now()/1000);
         let tokenSeconds = user.expires_in ? user.expires_in : 0;
-        const isValidRedditToken = (nowSeconds < tokenSeconds && (user.access_token ? true : false));
+        const hasRedditToken = (user.access_token ? true : false);
+        const isValidRedditToken = nowSeconds < tokenSeconds;
         res.status(200).json({
           id: user.id,
           token,
+          redditToken: hasRedditToken,
           redditAuth: isValidRedditToken,
           redditState: createRedditState({ id: user.id })
         });

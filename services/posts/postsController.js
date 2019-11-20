@@ -1,52 +1,63 @@
 const axios = require('axios');
 const {
-	getAllPosts,
-	createPost,
-	getPostById,
-	editPost,
-	deletePost,
-	getPostSuggestions
+  getAllPosts,
+  createPost,
+  getPostById,
+  editPost,
+  deletePost,
+  getPostSuggestions,
+  getAllPostsWithSuggestions
 } = require("./postsModel");
 
 const fetchAllUserPosts = async (req, res, next) => {
   try {
     const id = req.loggedInUser.subject;
-    const allPosts = await getAllPosts(id);
-    Promise.all(allPosts.map(post => getPostSuggestions(post.id))).then((allSuggestions) => {
-      allPosts = allPosts.map((post, i) => ({ ...post, suggestions: allSuggestions[i] }))
-      res.status(200).json(allPosts);
-    });
+    let allPosts = await getAllPostsWithSuggestions(id);
+    allPosts = allPosts.reduce((posts, post) => {
+      if (!posts[post.id]) {
+        posts[post.id] = { ...post };
+      }
+      if (!posts[post.id].suggestion) {
+        posts[post.id].suggestion = [];
+        delete posts[post.id].subreddit_id;
+        delete posts[post.id].subreddit_name;
+      }
+      if (post.subreddit_name && post.subreddit_id) {
+        posts[post.id].suggestion.push(post.subreddit_name);
+      }
+      return posts;
+    }, {});
+    allPosts = Object.values(allPosts);
+    res.status(200).json(allPosts);
   } catch (error) {
     next({ message: error });
   }
 };
 
 const fetchPostById = async (req, res) => {
-	const { id } = req.params;
-	try {
-		let post = await getPostById(id);
-		let suggestion = await getPostSuggestions(id);
-		let postSuggestion = { suggestion: suggestion, ...post };
-		res.status(200).json(postSuggestion);
-	} catch (err) {
-		res.status(400).json({
-			error: `Unable to process request for post ${id} 
-        information because ${err.message}`
-		});
-	}
-
+  const { id } = req.params;
+  try {
+    let post = await getPostById(id);
+    let suggestions = await getPostSuggestions(id);
+    let postSuggestion = {
+      ...post,
+      suggestion: suggestions.map(sug => sug.subreddit_name)
+    };
+    res.status(200).json(postSuggestion);
+  } catch (err) {
+    next({ message: error });
+  }
 };
-
 
 const makePost = (req, res, next) => {
   const { title, text } = req.body; // will receive the form values for a new post
-  const post = { 
-    title, 
-    text, 
+  const post = {
+    title,
+    text,
     user_id: req.loggedInUser.subject
   };
   Promise.all([
-    createPost(post), 
+    createPost(post),
     axios.post(config.dataScienceModel, post)
   ]).then(async ([newPost, suggestions]) => {
     // will ask for subreddit suggestions 
@@ -81,7 +92,7 @@ const createSubredditsIfNonExistent = (suggestions, next) => {
     let suggestionIds = [];
     suggestions.forEach(async (subreddit) => {
       let realSuggestion = await getSubreddit({ subreddit_name: subreddit });
-      if(!realSuggestion || !realSuggestion.id) {
+      if (!realSuggestion || !realSuggestion.id) {
         realSuggestion = await createSubreddit(subreddit);
       }
       suggestionIds.push(realSuggestion.id);
@@ -97,43 +108,63 @@ const connectPostToSuggestions = async (postId, suggestions, next) => {
   return await Promise.all(connections).then((res) => res).catch(next);
 }
 
-const updatePost = (req, res) => {
-	const { id } = req.params;
-	const post = req.body;
+const postReddit = (req, res, next) => {
+  const { subreddit, title, text } = req.body;
+  if (!subreddit) {
+    next({ message: "Missing required field `subreddit`", status: 401 });
+    return;
+  }
+  // required fields to submit a text post
+  // title, text, sr (subreddit name), kind (always "self"), 
+  // uh (currently logged in user's modhash) what is this 
+  const redditPost = {
+    sr: subreddit,
+    title: title,
+    text: text,
+    kind: 'self',
+    uh: user.access_token
+  }
+  res.status(200).json(redditPost);
+}
 
-	editPost(id, post)
-		.then(() => {
-			res.status(200).json({
-				message: `Succefully updated post ${id} with ${post.title} ${post.text}`
-			});
-		})
-		.catch(err => {
-			res.status(400).json({
-				message: `Unable to process request to update post ${id} because
+const updatePost = (req, res) => {
+  const { id } = req.params;
+  const post = req.body;
+
+  editPost(id, post)
+    .then(() => {
+      res.status(200).json({
+        message: `Succefully updated post ${id} with ${post.title} ${post.text}`
+      });
+    })
+    .catch(err => {
+      res.status(400).json({
+        message: `Unable to process request to update post ${id} because
         ${err.message}`
-			});
-		});
+      });
+    });
 };
 
 const removePost = (req, res) => {
-	const { id } = req.params;
-	deletePost(id)
-		.then(() => {
-			res.status(200).json({
-				message: `Post ${id} was succesfully removed`
-			});
-		})
-		.catch(err => {
-			res.status(400).json({
-				error: `Unable to process removal because of ${err.message}`
-			});
-		});
+  const { id } = req.params;
+  deletePost(id)
+    .then(() => {
+      res.status(200).json({
+        message: `Post ${id} was succesfully removed`
+      });
+    })
+    .catch(err => {
+      res.status(400).json({
+        error: `Unable to process removal because of ${err.message}`
+      });
+    });
 };
 
 module.exports = {
-	fetchAllUserPosts,
-	fetchPostById,
-	makePost,
-	updatePost,
-	removePost
+  fetchAllUserPosts,
+  fetchPostById,
+  makePost,
+  postReddit,
+  updatePost,
+  removePost
 };

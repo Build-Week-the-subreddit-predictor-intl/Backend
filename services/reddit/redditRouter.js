@@ -5,6 +5,7 @@ const redditRouter = require('express').Router();
 const { findUser, updateUser } = require('../auth/authModel');
 const {
   requireLogin,
+  requireReddit,
   handleErrors,
   objectToQueryString,
   toBase64,
