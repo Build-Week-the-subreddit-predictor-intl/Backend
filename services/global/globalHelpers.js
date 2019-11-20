@@ -23,6 +23,28 @@ const requireLogin = (req, res, next) => {
   }
 }
 
+const requireReddit = (req, res, next) => {
+  const { state, error } = req.body;
+  if (error) { 
+    next({ message: error });
+    return;
+  }
+  if (!state) {
+    next({ message: "Missing required field `state`!", status: 401 });
+    return;
+  } else {
+    jwt.verify(token, config.jwtSecret, (err, decodedRedditToken) => {
+      if (err) {
+        next({ message: err });
+        return;
+      } else {
+        req.redditState = decodedRedditToken;
+        next();
+      }
+    });
+  }
+}
+
 const handleErrors = (file, router) => {
   router.use((error, req, res, next) => {
     res.status(error.status || 500).json({
@@ -46,6 +68,7 @@ const toUTF8 = (data) => Buffer.from(data, 'base64').toString('utf-8');
 module.exports = {
   logger,
   requireLogin,
+  requireReddit,
   handleErrors,
   objectToQueryString,
   toBase64,

@@ -1,11 +1,12 @@
 const config = require('../../config');
-const { objectToQueryString, toBase64 } = require('../global/globalHelpers');
+const jwt = require('jsonwebtoken');
+const { objectToQueryString } = require('../global/globalHelpers');
 
 const authorizeRedditAccess = (info, isMobile = false) => {
   const options = {
     client_id: config.redditClientId,
     response_type: 'code',
-    state: toBase64(JSON.stringify(info)),
+    state: createRedditState(info),
     redirect_uri: config.redditRedirectURL,
     duration: 'permanent',
     scope: 'submit mysubreddits' // OR 'submit,mysubreddits'
@@ -14,6 +15,18 @@ const authorizeRedditAccess = (info, isMobile = false) => {
   return 'https://www.reddit.com/api/v1/authorize' + (isMobile ? '.compact' : '') + objectToQueryString(options);
 }
 
+const createRedditState = (info) => {
+  const payload = {
+    subject: "RedditAuthToken",
+    ...info
+  }
+	const options = {
+		expiresIn: "8h"
+	};
+  return jwt.sign(payload, config.jwtSecret, options);
+}
+
 module.exports = {
+  createRedditState,
   authorizeRedditAccess
 }

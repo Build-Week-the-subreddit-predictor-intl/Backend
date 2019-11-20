@@ -7,8 +7,7 @@ const {
   requireLogin,
   handleErrors,
   objectToQueryString,
-  toBase64,
-  toUTF8
+  toBase64
 } = require('../global/globalHelpers');
 const { authorizeRedditAccess } = require('./redditController');
 // Endpoints
@@ -20,24 +19,24 @@ redditRouter.get('/', requireLogin, (req, res, next) => {
   res.status(200).json({ url: authorizeRedditAccess(data, mobile ? true : false) });
 });
 
-redditRouter.post('/auth', async (req, res, next) => {
+redditRouter.post('/auth', requireLogin, requireReddit, async (req, res, next) => {
   try {
-    const { state, code, error } = req.body;
+    const { redditState } = req;
+    const { code } = req.body;
     if (error) {
       next({ message: error, status: 403 });
       return;
     }
-    const validState = JSON.parse(toUTF8(decodeURIComponent(state))); // TODO: IMPORTANT missing check if state has been tampered with!!!
-    if (!validState || !validState.id) {
-      next({ message: "Invalid state/code. Data has been compromised.", status: 401 });
-      return;
-    }
-    let user = await findUser({ id: validState.id });
+    let user = await findUser({ id: redditState.id });
     let payload = {
-      grant_type: (!user.access_token ? 'authorization_code' : 'refresh_token'), 
+      grant_type: (!user.access_token ? 'authorization_code' : 'refresh_token'),
       redirect_uri: config.redditRedirectURL,
     };
     if (payload.grant_type !== 'refresh_token') {
+      if (!code) {
+        next({ message: "Missing required field `code`", status: 401 });
+        return;
+      }
       payload.code = code;
     } else {
       payload.refresh_token = user.refresh_token;
@@ -51,7 +50,7 @@ redditRouter.post('/auth', async (req, res, next) => {
       return;
     }
     // save access_token, refresh_token to user table | token_type, expires_in, scope
-    redditAccess.data.expires_in = Math.floor(Date.now()/1000) + redditAccess.data.expires_in;
+    redditAccess.data.expires_in = Math.floor(Date.now() / 1000) + redditAccess.data.expires_in;
     const updatedUser = await updateUser(redditAccess.data, user.id);
     if (updatedUser && updatedUser.id) {
       res.status(200).json({ authorized: true });
