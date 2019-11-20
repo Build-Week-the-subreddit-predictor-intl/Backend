@@ -17,9 +17,12 @@ authRouter.post('/login', validateLoginBody, (req, res, next) => {
         next({ status: 403, message: "Invalid credentials" });
       } else {
         const token = generateJWT(user);
+        let nowSeconds = Math.floor(Date.now()/1000);
+        let tokenSeconds = user.expires_in ? user.expires_in : 0;
         res.status(200).json({
           id: user.id,
-          token
+          token,
+          redditAuth: (nowSeconds < tokenSeconds && (user.access_token ? true : false))
         });
       }
     }

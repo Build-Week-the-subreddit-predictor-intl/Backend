@@ -27,7 +27,7 @@ redditRouter.post('/auth', async (req, res, next) => {
       next({ message: error, status: 403 });
       return;
     }
-    const validState = JSON.parse(toUTF8(state)); // TODO: IMPORTANT missing check if state has been tampered with!!!
+    const validState = JSON.parse(toUTF8(decodeURIComponent(state))); // TODO: IMPORTANT missing check if state has been tampered with!!!
     if (!validState || !validState.id) {
       next({ message: "Invalid state/code. Data has been compromised.", status: 401 });
       return;
@@ -37,8 +37,10 @@ redditRouter.post('/auth', async (req, res, next) => {
       grant_type: (!user.access_token ? 'authorization_code' : 'refresh_token'), 
       redirect_uri: config.redditRedirectURL,
     };
-    if (code) {
+    if (payload.grant_type !== 'refresh_token') {
       payload.code = code;
+    } else {
+      payload.refresh_token = user.refresh_token;
     }
     payload = objectToQueryString(payload, false);
     let auth = toBase64(config.redditClientId + ':' + config.redditClientSecret);
@@ -49,8 +51,9 @@ redditRouter.post('/auth', async (req, res, next) => {
       return;
     }
     // save access_token, refresh_token to user table | token_type, expires_in, scope
+    redditAccess.data.expires_in = Math.floor(Date.now()/1000) + redditAccess.data.expires_in;
     const updatedUser = await updateUser(redditAccess.data, user.id);
-    if (updatedUser.data && updatedUser.data.id) {
+    if (updatedUser && updatedUser.id) {
       res.status(200).json({ authorized: true });
     } else {
       res.status(403).json({ authorized: false });
