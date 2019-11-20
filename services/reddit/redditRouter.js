@@ -8,8 +8,7 @@ const {
   requireReddit,
   handleErrors,
   objectToQueryString,
-  toBase64,
-  requireReddit
+  toBase64
 } = require('../global/globalHelpers');
 const { authorizeRedditAccess } = require('./redditController');
 // Endpoints
@@ -24,7 +23,7 @@ redditRouter.get('/', requireLogin, (req, res, next) => {
 redditRouter.post('/auth', requireLogin, requireReddit, async (req, res, next) => {
   try {
     const { redditState } = req;
-    const { code } = req.body;
+    const { code, error } = req.body;
     if (error) {
       next({ message: error, status: 403 });
       return;

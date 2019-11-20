@@ -1,5 +1,5 @@
 const config = require('../../config');
-const bcrypt = require('bcryptjs');
+const { findUser } = require('../auth/authModel');
 const jwt = require('jsonwebtoken');
 
 const logger = (req, res, next) => {
@@ -58,6 +58,7 @@ const requireRedditAccess = async (req, res, next) => {
     next({ message: "User is not authenticated with reddit!", status: 403 });
     return;
   }
+  req.redditUser = user;
   next();
 }
 
