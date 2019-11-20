@@ -122,7 +122,7 @@ const postReddit = (req, res, next) => {
     title: title,
     text: text,
     kind: 'self',
-    uh: user.access_token
+    uh: req.redditUser.access_token
   }
   res.status(200).json(redditPost);
 }
