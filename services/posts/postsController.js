@@ -37,23 +37,6 @@ const fetchPostById = async (req, res) => {
 
 };
 
-// const fetchAllUserPostsWithSuggestions = async (req, res, next) => {
-// 	try {
-// 		const { id } = req.params;
-// 		let allPosts = await getAllPosts(id);
-// 		Promise.all(allPosts.map(post => getPostSuggestions(post.id))).then(
-// 			allSuggestions => {
-// 				allPosts = allPosts.map((post, i) => ({
-// 					...post,
-// 					suggestions: allSuggestions[i]
-// 				}));
-// 				res.status(200).json(allPosts);
-// 			}
-// 		);
-// 	} catch (error) {
-// 		next({ message: error });
-// 	}
-// };
 
 const makePost = (req, res, next) => {
   const { title, text } = req.body; // will receive the form values for a new post

@@ -9,3 +9,12 @@ describe("correctly importing server file into index", () => {
       .expect({ message: "Server is running" });
   });
 });
+
+describe("checking if post should not work", () => {
+	test("Post is not functional", () => {
+		return request(server)
+			.post("/")
+			.expect(404)
+  
+  });
+});
