@@ -109,12 +109,22 @@ const connectPostToSuggestions = async (postId, suggestions, next) => {
 }
 
 const postReddit = (req, res, next) => {
-  const { subreddit, post } = req.body;
+  const { subreddit, title, text } = req.body;
   if (!subreddit) {
     next({ message: "Missing required field `subreddit`", status: 401 });
     return;
   }
-  res.status(200).json({ post: req.post });
+  // required fields to submit a text post
+  // title, text, sr (subreddit name), kind (always "self"), 
+  // uh (currently logged in user's modhash) what is this 
+  const redditPost = {
+    sr: subreddit,
+    title: title,
+    text: text,
+    kind: 'self',
+    uh: user.access_token
+  }
+  res.status(200).json(redditPost);
 }
 
 const updatePost = (req, res) => {

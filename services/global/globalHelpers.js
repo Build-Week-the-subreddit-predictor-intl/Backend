@@ -25,7 +25,7 @@ const requireLogin = (req, res, next) => {
 
 const requireReddit = (req, res, next) => {
   const { state, error } = req.body;
-  if (error) { 
+  if (error) {
     next({ message: error });
     return;
   }
@@ -33,7 +33,7 @@ const requireReddit = (req, res, next) => {
     next({ message: "Missing required field `state`!", status: 401 });
     return;
   } else {
-    jwt.verify(token, config.jwtSecret, (err, decodedRedditToken) => {
+    jwt.verify(state, config.jwtSecret, (err, decodedRedditToken) => {
       if (err) {
         next({ message: err });
         return;
@@ -43,6 +43,22 @@ const requireReddit = (req, res, next) => {
       }
     });
   }
+}
+
+const requireRedditAccess = async (req, res, next) => {
+  const user = await findUser({ id: req.loggedInUser.subject });
+  if (!user.access_token) {
+    next({ message: "User is not authenticated with reddit!", status: 403 });
+    return;
+  }
+  let nowSeconds = Math.floor(Date.now()/1000);
+  let tokenSeconds = user.expires_in ? user.expires_in : 0;
+  const isValidRedditToken = nowSeconds < tokenSeconds;
+  if (!isValidRedditToken) {
+    next({ message: "User is not authenticated with reddit!", status: 403 });
+    return;
+  }
+  next();
 }
 
 const handleErrors = (file, router) => {
@@ -69,6 +85,7 @@ module.exports = {
   logger,
   requireLogin,
   requireReddit,
+  requireRedditAccess,
   handleErrors,
   objectToQueryString,
   toBase64,
