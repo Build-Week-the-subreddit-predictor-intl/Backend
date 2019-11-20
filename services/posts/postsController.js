@@ -1,4 +1,6 @@
+const config = require('../../config');
 const axios = require('axios');
+const snoowrap = require('snoowrap');
 const {
   createPost,
   getPostById,
@@ -107,23 +109,30 @@ const connectPostToSuggestions = async (postId, suggestions, next) => {
   return await Promise.all(connections).then((res) => res).catch(next);
 }
 
-const postReddit = (req, res, next) => {
+const postReddit = async (req, res, next) => {
   const { subreddit, title, text } = req.body;
   if (!subreddit) {
     next({ message: "Missing required field `subreddit`", status: 401 });
     return;
   }
-  // required fields to submit a text post
-  // title, text, sr (subreddit name), kind (always "self"), 
-  // uh (currently logged in user's modhash) what is this 
   const redditPost = {
     sr: subreddit,
     title: title,
     text: text,
     kind: 'self',
-    uh: req.redditUser.access_token
   }
-  res.status(200).json(redditPost);
+  const me = new snoowrap({
+    userAgent: req.headers['user-agent'],
+    clientId: config.redditClientId,
+    clientSecret: config.redditClientSecret,
+    refreshToken: req.redditUser.refresh_token
+  })
+  try {
+    let sendPost = await me.getSubreddit(subreddit).submitSelfpost(redditPost);
+    res.status(200).json(sendPost);
+  } catch (error) {
+    next({ message: error.message });
+  }
 }
 
 const updatePost = (req, res) => {
