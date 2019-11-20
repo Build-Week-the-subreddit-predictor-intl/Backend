@@ -8,7 +8,8 @@ const {
   requireReddit,
   handleErrors,
   objectToQueryString,
-  toBase64
+  toBase64,
+  requireReddit
 } = require('../global/globalHelpers');
 const { authorizeRedditAccess } = require('./redditController');
 // Endpoints
