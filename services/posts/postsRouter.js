@@ -1,6 +1,7 @@
 const express = require("express");
 
-const { validatePost } = require("./postsMiddleware");
+const { handleErrors, requireLogin } = require('../global/globalHelpers');
+const { validatePost, validatePostId } = require("./postsMiddleware");
 
 const {
 	fetchAllUserPosts,
@@ -12,12 +13,12 @@ const {
 
 const router = express.Router();
 
-router.post("/", validatePost, makePost);
+router.get("/", requireLogin, fetchAllUserPosts);
+router.get("/:id", requireLogin, validatePostId, fetchPostById);
+router.post("/", requireLogin, validatePost, makePost);
+router.put("/:id", requireLogin, validatePostId, validatePost, updatePost);
+router.delete("/:id", requireLogin, validatePostId, removePost);
 
-router.get("/all/:id", fetchAllUserPosts);
-
-router.get("/:id", fetchPostById);
-router.put("/:id", validatePost, updatePost);
-router.delete("/:id", removePost);
+handleErrors('postsRouter', router);
 
 module.exports = router;

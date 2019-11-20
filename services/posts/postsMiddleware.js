@@ -1,17 +1,25 @@
 function validatePost(req, res, next) {
 	const { text, title } = req.body;
-	if (!Object.keys(req.body)) {
-		res.status(400).json({
-			message: "post data was not provided"
-		});
+	if (!Object.keys(req.body).length) {
+		next({ message: "Post data was not provided", status: 400 });
 	}
-	!text || !title
-		? res.status(400).json({
-				message: "post title or body data was not provided"
-		})
-		: next();
+	if(!title || !text) {
+    next({ message: "Missing one of the required fields: title, text", status: 401 })
+  } else {
+    next();
+  }
+}
+
+function validatePostId(req, res, next) {
+  const { id } = req.params;
+  if(!id || !Number.isInteger(id)) {
+    next({ message: "Invalid post id!", status: 401 });
+  } else {
+    next();
+  }
 }
 
 module.exports = {
-	validatePost
+  validatePost,
+  validatePostId
 };

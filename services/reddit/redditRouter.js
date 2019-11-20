@@ -1,55 +1,64 @@
 const config = require('../../config');
-const bcrypt = require('bcryptjs');
+const axios = require('axios');
 const redditRouter = require('express').Router();
 // Helpers
-const authHelpers = require('../auth/authHelpers');
+const { findUser, updateUser } = require('../auth/authModel');
 const {
   requireLogin,
   handleErrors,
-  authorizeRedditAccess,
-  objectToQueryString
+  objectToQueryString,
+  toBase64
 } = require('../global/globalHelpers');
+const { authorizeRedditAccess } = require('./redditController');
 // Endpoints
 redditRouter.get('/', requireLogin, (req, res, next) => {
   const { mobile } = req.query;
-  res.status(200).json({ url: authorizeRedditAccess(mobile ? true : false) });
+  const data = {
+    id: req.loggedInUser.subject,
+  };
+  res.status(200).json({ url: authorizeRedditAccess(data, mobile ? true : false) });
 });
 
-redditRouter.get('/auth', requireLogin, (req, res, next) => {
-  const { state, code, error } = req.query;
-  if (!error) {
-    const isValidState = bcrypt.compareSync(config.redditState, decodeURIComponent(state));
-    let payload = objectToQueryString({
-      grant_type: (req.loggedInUser.access_token ? 'refresh_token' : 'authorization_code'),
-      redirect_uri: config.redditRedirectURL,
-    }, false);
-    if (isValidState) {
-      if (code) {
-        payload.code = code;
-      }
-      axios.post('https://www.reddit.com/api/v1/access_token', payload).then(response => {
-        // save access_token, refresh_token to user table | token_type, expires_in, scope
-        const data = response.data;
-        let payload;
-        if (data.access_token) {
-          payload.access_token = data.access_token;
-        } else next({ message: "No access token could be provided.", status: 404 });
-        if (data.refresh_token) {
-          payload.refresh_token = data.refresh_token;
-        }
-        authHelpers.updateUser(payload, req.loggedInUser.id).then(response => {
-          if (response.data && response.data.id) {
-            res.status(200).json({ authorized: true }); //req.loggedInUser.redditAuth = true;
-          } else {
-            res.status(403).json({ authorized: false });
-          }
-        }).catch(next);
-      });
-    } else {
-      next({ message: "Invalid state/code. Data has been compromised.", status: 401 });
+redditRouter.post('/auth', requireLogin, requireReddit, async (req, res, next) => {
+  try {
+    const { redditState } = req;
+    const { code } = req.body;
+    if (error) {
+      next({ message: error, status: 403 });
+      return;
     }
-  } else {
-    next({ message: error, status: 403 });
+    let user = await findUser({ id: redditState.id });
+    let payload = {
+      grant_type: (!user.access_token ? 'authorization_code' : 'refresh_token'),
+      redirect_uri: config.redditRedirectURL,
+    };
+    if (payload.grant_type !== 'refresh_token') {
+      if (!code) {
+        next({ message: "Missing required field `code`", status: 401 });
+        return;
+      }
+      payload.code = code;
+    } else {
+      payload.refresh_token = user.refresh_token;
+    }
+    payload = objectToQueryString(payload, false);
+    let auth = toBase64(config.redditClientId + ':' + config.redditClientSecret);
+    let options = { headers: { Authorization: 'Basic ' + auth } };
+    const redditAccess = await axios.post('https://www.reddit.com/api/v1/access_token', payload, options)
+    if (redditAccess.data.error) {
+      next({ message: redditAccess.data.error });
+      return;
+    }
+    // save access_token, refresh_token to user table | token_type, expires_in, scope
+    redditAccess.data.expires_in = Math.floor(Date.now() / 1000) + redditAccess.data.expires_in;
+    const updatedUser = await updateUser(redditAccess.data, user.id);
+    if (updatedUser && updatedUser.id) {
+      res.status(200).json({ authorized: true });
+    } else {
+      res.status(403).json({ authorized: false });
+    }
+  } catch (error) {
+    next({ message: error });
   }
 });
 

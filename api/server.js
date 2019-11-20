@@ -28,6 +28,6 @@ server.get("/", (req, res) => {
 
 server.use("/api/auth", authRouter);
 server.use("/api/reddit", redditRouter);
-server.use("/api/posts",  postsRouter);
+server.use("/api/posts", postsRouter);
 
 module.exports = server;
