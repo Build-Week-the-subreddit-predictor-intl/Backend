@@ -82,6 +82,14 @@ const objectToQueryString = (obj, questionMark = true) => {
 const toBase64 = (data) => Buffer.from(data).toString('base64');
 const toUTF8 = (data) => Buffer.from(data, 'base64').toString('utf-8');
 
+const getRedditAxiosOptions = () => {
+  return { 
+    headers: { 
+      Authorization: 'Basic ' + toBase64(config.redditClientId + ':' + config.redditClientSecret),
+    }
+  };
+}
+
 module.exports = {
   logger,
   requireLogin,
@@ -90,5 +98,6 @@ module.exports = {
   handleErrors,
   objectToQueryString,
   toBase64,
-  toUTF8
+  toUTF8,
+  getRedditAxiosOptions
 };
