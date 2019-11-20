@@ -4,6 +4,15 @@ function getAllPosts(id) {
 	return db("posts").where("user_id", "=", id);
 }
 
+function getAllPostsWithSuggestions(id) {
+  return db("posts as p")
+    .leftJoin("post_suggestion as ps", "ps.post_id", "p.id")
+    .leftJoin("subreddits as sr", "sr.id", "ps.subreddit_id")
+    .where({ user_id: id })
+    .select('p.*', 'sr.subreddit_name', 'ps.subreddit_id')
+    .orderBy('ps.post_id');
+}
+
 function getPostSuggestions(id) {
 	return db("post_suggestion as ps")
 		.join("posts as p", "p.id", "ps.post_id")
@@ -44,11 +53,12 @@ function createSubreddit(name) {
 }
 
 function createPostSuggestion(post_id, subreddit_id) {
-  return db("post_suggestion").insert({ post_id, subreddit_id }, '*').first();
+  return db("post_suggestion").insert({ post_id, subreddit_id }, '*');
 }
 
 module.exports = {
-	getAllPosts,
+  getAllPosts,
+  getAllPostsWithSuggestions,
 	createPost,
 	getPostById,
 	editPost,

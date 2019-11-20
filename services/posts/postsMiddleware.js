@@ -12,7 +12,7 @@ function validatePost(req, res, next) {
 
 function validatePostId(req, res, next) {
   const { id } = req.params;
-  if(!id || !Number.isInteger(id)) {
+  if(!id || !Number.isInteger(Number(id)) || id < 1) {
     next({ message: "Invalid post id!", status: 401 });
   } else {
     next();
