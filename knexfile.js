@@ -21,7 +21,7 @@ module.exports = {
 	},
 
 	testing: {
-		client: "pg",
+		client: "sqlite3",
 		connection: {
 			filename: "./database/subredditpredictor_testing.db3"
 		},

@@ -1,6 +1,5 @@
 const axios = require('axios');
 const {
-  getAllPosts,
   createPost,
   getPostById,
   editPost,
