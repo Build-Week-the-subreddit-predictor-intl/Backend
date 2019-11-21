@@ -16,18 +16,23 @@ beforeEach(async () => {
 	await db("post_suggestion").truncate();
 	await db("subreddits").truncate();
 	await db("posts").truncate();
-	await db("users").truncate();
+	return await db("users").truncate();
 });
 
-describe("suggestion models", () => {
-	describe("create suggestion", () => {
-		it("create suggestion", async () => {
-			await addUser(user);
-			await createPost(post);
-			await createSubreddit(subreddit);
-			await createPostSuggestion(1, 1);
-			suggestionList = await db("post_suggestion");
-			expect(suggestionList).toHaveLength(1);
-		});
+afterEach(async () => {
+	await db("post_suggestion").truncate();
+	await db("subreddits").truncate();
+	await db("posts").truncate();
+	return await db("users").truncate();
+});
+
+describe("create suggestion", () => {
+	it("create suggestion", async () => {
+		await addUser(user);
+		await createPost(post);
+		await createSubreddit(subreddit);
+		await createPostSuggestion(1, 1);
+		suggestionList = await db("post_suggestion");
+		expect(suggestionList).toHaveLength(1);
 	});
 });

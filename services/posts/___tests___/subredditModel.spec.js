@@ -10,7 +10,7 @@ beforeEach(() => {
 	return db("subreddits").truncate();
 });
 
-describe("subreddits models", () => {
+
 	describe("create subreddit", () => {
 		it("create subreddit", async () => {
 			await createSubreddit(subreddit);
@@ -25,4 +25,3 @@ describe("subreddits models", () => {
 			expect(subredditList == 'object');
 		});
 	});
-});
