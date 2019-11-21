@@ -10,7 +10,7 @@ exports.up = function(knex) {
 			.onDelete("CASCADE")
 			.onUpdate("CASCADE");
 		table.string("title").notNullable();
-		table.string("text").notNullable();
+		table.text("text").notNullable();
 		table.boolean("ad").defaultTo(false);
 		table.string("flair_id", 36);
 		table.string("flair_text", 64);
