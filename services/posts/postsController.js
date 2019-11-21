@@ -89,7 +89,7 @@ const makePost = (req, res, next) => {
         if (!connected && !connected.length) {
           next({ message: "Could not connect post with suggested subreddits!" });
         } else { // send back the new post
-          res.status(201).json({ ...newPost, suggestions: allSuggestions.map(sug => sug.subreddit_name) });
+          res.status(201).json({ ...newPost, suggestion: allSuggestions.map(sug => sug.subreddit_name) });
         }
       }
     }
