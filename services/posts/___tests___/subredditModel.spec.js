@@ -10,6 +10,10 @@ beforeEach(() => {
 	return db("subreddits").truncate();
 });
 
+afterEach(() => {
+	return db("subreddits").truncate();
+});
+
 
 	describe("create subreddit", () => {
 		it("create subreddit", async () => {

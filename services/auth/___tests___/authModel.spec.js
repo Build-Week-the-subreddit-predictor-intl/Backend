@@ -21,21 +21,21 @@ afterEach(() => {
 
 describe("create user", () => {
 	it("should insert user", async () => {
-		await addUser(user);
+		addUser(user);
 		userList = await db("users");
 		expect(userList).toHaveLength(1);
 	});
 });
 describe("get all users", () => {
 	it("get users", async () => {
-		await addUser(user);
+		 addUser(user);
 		userList = await findUsers();
 		expect(userList).toHaveLength(1);
 	});
 });
 describe("get  user", () => {
 	it("get user by id", async () => {
-		await addUser(user);
+		 addUser(user);
 		userList = await findUser({ username: "test" });
 		expect(userList == "object");
 	});

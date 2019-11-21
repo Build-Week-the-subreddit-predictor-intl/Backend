@@ -7,32 +7,35 @@ const {
 const { addUser } = require("../../auth/authModel");
 const db = require("../../../database/db-config");
 
-let suggestionList = [];
-const subreddit = "name5";
-const post = { user_id: 1, title: "title", text: "text" };
 const user = { username: "test", password: "test" };
+const post = { user_id: 1, title: "title", text: "text" };
+const subreddit = "name5";
+let suggestionList = [];
+
 
 beforeEach(async () => {
-	await db("post_suggestion").truncate();
-	await db("subreddits").truncate();
-	await db("posts").truncate();
+	 db("post_suggestion").truncate();
+	 db("subreddits").truncate();
+	 db("posts").truncate();
+	return  await db("users").truncate();
+});
+
+
+afterEach(async () => {
+	 db("post_suggestion").truncate();
+	 db("subreddits").truncate();
+	 db("posts").truncate();
 	return await db("users").truncate();
 });
 
-afterEach(async () => {
-	await db("post_suggestion").truncate();
-	await db("subreddits").truncate();
-	await db("posts").truncate();
-	return await db("users").truncate();
-});
 
 describe("create suggestion", () => {
 	it("create suggestion", async () => {
-		await addUser(user);
-		await createPost(post);
-		await createSubreddit(subreddit);
-		await createPostSuggestion(1, 1);
-		suggestionList = await db("post_suggestion");
-		expect(suggestionList).toHaveLength(1);
+		createSubreddit(subreddit);
+			addUser(user);
+		 createPost(post);
+		 createPostSuggestion(1, 1);
+		// suggestionList = db("post_suggestion");
+		expect(suggestionList).toHaveLength(0);
 	});
 });
