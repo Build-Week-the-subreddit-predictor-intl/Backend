@@ -22,7 +22,7 @@ function getPostSuggestions(id) {
 }
 
 function createPost(post) {
-	return db("posts").insert(post, '*');
+	return db("posts").insert(post, 'id').then(ids => getPostById(ids[0]));
 }
 
 function getPostById(id) {
@@ -52,8 +52,12 @@ function createSubreddit(name) {
   return db("subreddits").insert({ subreddit_name: name }, 'id').then(ids => getSubreddit({ id: ids[0] }));
 }
 
+function getPostSuggestion(id) {
+  return db("post_suggestion").where({ id }).first();
+}
+
 function createPostSuggestion(post_id, subreddit_id) {
-  return db("post_suggestion").insert({ post_id, subreddit_id }, '*');
+  return db("post_suggestion").insert({ post_id, subreddit_id }, 'id').then(ids => getPostSuggestion(ids[0]));
 }
 
 module.exports = {
