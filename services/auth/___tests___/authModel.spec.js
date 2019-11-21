@@ -15,38 +15,40 @@ beforeEach(() => {
 	return db("users").truncate();
 });
 
-describe("user model", () => {
-	describe("create user", () => {
-		it("should insert user", async () => {
-			await addUser(user);
-			userList = await db("users");
-			expect(userList).toHaveLength(1);
-		});
+afterEach(() => {
+	return db("users").truncate();
+});
+
+describe("create user", () => {
+	it("should insert user", async () => {
+		await addUser(user);
+		userList = await db("users");
+		expect(userList).toHaveLength(1);
 	});
-	describe("get all users", () => {
-		it("get users", async () => {
-			await addUser(user);
-			userList = await findUsers();
-			expect(userList).toHaveLength(1);
-		});
+});
+describe("get all users", () => {
+	it("get users", async () => {
+		await addUser(user);
+		userList = await findUsers();
+		expect(userList).toHaveLength(1);
 	});
-	describe("get  user", () => {
-		it("get user by id", async () => {
-      await addUser(user);
-			userList = await findUser({username: 'test'});
-			expect(userList == "object");
-		});
+});
+describe("get  user", () => {
+	it("get user by id", async () => {
+		await addUser(user);
+		userList = await findUser({ username: "test" });
+		expect(userList == "object");
 	});
-	describe("update user", () => {
-		it("update user", async () => {
-			postList = await updateUser({ username: "namee", ...user }, 1);
-			expect(postList === "number");
-		});
+});
+describe("update user", () => {
+	it("update user", async () => {
+		postList = await updateUser({ username: "namee", ...user }, 1);
+		expect(postList === "number");
 	});
-	describe("deleteuser", () => {
-		it("delete user", async () => {
-			postList = await removeUser(1);
-			expect(typeof postList === 'number');
-		});
+});
+describe("deleteuser", () => {
+	it("delete user", async () => {
+		postList = await removeUser(1);
+		expect(typeof postList === "number");
 	});
 });
