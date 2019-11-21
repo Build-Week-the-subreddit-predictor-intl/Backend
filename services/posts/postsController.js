@@ -1,13 +1,17 @@
 const config = require('../../config');
 const axios = require('axios');
 const snoowrap = require('snoowrap');
+const { objectToQueryString } = require('../global/globalHelpers');
 const {
   createPost,
   getPostById,
   editPost,
   deletePost,
   getPostSuggestions,
-  getAllPostsWithSuggestions
+  getAllPostsWithSuggestions,
+  getSubreddit,
+  createSubreddit,
+  createPostSuggestion
 } = require("./postsModel");
 
 const fetchAllUserPosts = async (req, res, next) => {
@@ -59,7 +63,7 @@ const makePost = (req, res, next) => {
   };
   Promise.all([
     createPost(post),
-    axios.post(config.dataScienceModel, post)
+    axios.get(config.dataScienceModel + objectToQueryString({ title, body: text }))
   ]).then(async ([newPost, suggestions]) => {
     // will ask for subreddit suggestions 
     // will save the post
@@ -67,21 +71,25 @@ const makePost = (req, res, next) => {
       next({ message: "Could not insert post" });
       return;
     }
-    if (!suggestions || !suggestions.data.length) { // respond with no suggestions :c
+    if (!suggestions) {
       res.status(404).json({ ...newPosts, suggestions: [] });
     } else { // if got suggestions
       // create auto insert and return id's function from subreddits table
-      const allSuggestions = await createSubredditsIfNonExistent(suggestions.data, next);
+      let suggestionsInfo;
+      if(Array.isArray(suggestions.data)) {
+        suggestionsInfo = suggestions.data.map(sug => sug.subreddit);
+      } else {
+        suggestionsInfo = [suggestions.data.subreddit]
+      }
+      const allSuggestions = await createSubredditsIfNonExistent(suggestionsInfo, next);
       if (!allSuggestions || !allSuggestions.length) {
         next({ message: "Could not add suggestions!" });
-      } else {
-        // connect all suggestions with the post
+      } else { // connect all suggestions with the post
         const connected = await connectPostToSuggestions(newPost.id, allSuggestions, next);
         if (!connected && !connected.length) {
           next({ message: "Could not connect post with suggested subreddits!" });
-        } else {
-          // send back the new post
-          res.status(201).json({ ...newPost, suggestions: allSuggestions });
+        } else { // send back the new post
+          res.status(201).json({ ...newPost, suggestions: allSuggestions.map(sug => sug.subreddit_name) });
         }
       }
     }
@@ -90,14 +98,13 @@ const makePost = (req, res, next) => {
 
 const createSubredditsIfNonExistent = (suggestions, next) => {
   try {
-    let suggestionIds = [];
-    suggestions.forEach(async (subreddit) => {
+    let suggestionIds = Promise.all(suggestions.map(async (subreddit) => {
       let realSuggestion = await getSubreddit({ subreddit_name: subreddit });
       if (!realSuggestion || !realSuggestion.id) {
         realSuggestion = await createSubreddit(subreddit);
       }
-      suggestionIds.push(realSuggestion.id);
-    });
+      return realSuggestion;
+    }));
     return suggestionIds;
   } catch (error) {
     next({ message: error });
@@ -105,7 +112,7 @@ const createSubredditsIfNonExistent = (suggestions, next) => {
 }
 
 const connectPostToSuggestions = async (postId, suggestions, next) => {
-  let connections = suggestions.map((id) => createPostSuggestion(postId, id))
+  let connections = suggestions.map((suggestion) => createPostSuggestion(postId, suggestion.id))
   return await Promise.all(connections).then((res) => res).catch(next);
 }
 
